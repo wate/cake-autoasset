@@ -1,0 +1,21 @@
+# PHPUnit cache
+.phpunit.cache/
+
+# Composer
+vendor/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+
+# Logs
+*.log
