@@ -224,4 +224,59 @@ class AutoAssetHelperTest extends TestCase
         $this->assertContains('Hearings/all', $files);
         $this->assertContains('Hearings/input', $files);
     }
+
+    /**
+     * Test scripts() HTML output
+     */
+    public function testScriptsOutput(): void
+    {
+        $helper = $this->createHelper([
+            'controller' => 'Hearings',
+            'action' => 'index',
+        ]);
+        $this->createAssetFile('js/all.js');
+        $this->createAssetFile('js/Hearings/index.js');
+
+        $helper->scripts();
+
+        $scriptBlock = $helper->getView()->fetch('script');
+        $this->assertStringContainsString('all.js', $scriptBlock);
+        $this->assertStringContainsString('Hearings/index.js', $scriptBlock);
+    }
+
+    /**
+     * Test styles() HTML output
+     */
+    public function testStylesOutput(): void
+    {
+        $helper = $this->createHelper([
+            'controller' => 'Hearings',
+            'action' => 'index',
+        ]);
+        $this->createAssetFile('css/all.css');
+        $this->createAssetFile('css/Hearings/index.css');
+
+        $helper->styles();
+
+        $cssBlock = $helper->getView()->fetch('css');
+        $this->assertStringContainsString('all.css', $cssBlock);
+        $this->assertStringContainsString('Hearings/index.css', $cssBlock);
+    }
+
+    /**
+     * Test empty output when no files exist
+     */
+    public function testScriptsEmptyOutput(): void
+    {
+        $helper = $this->createHelper([
+            'controller' => 'Hearings',
+            'action' => 'index',
+        ]);
+
+        $helper->scripts();
+        $helper->styles();
+
+        $this->assertEmpty($helper->getView()->fetch('script'));
+        $this->assertEmpty($helper->getView()->fetch('css'));
+    }
 }

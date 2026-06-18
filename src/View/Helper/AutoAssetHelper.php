@@ -21,8 +21,8 @@ class AutoAssetHelper extends Helper
     protected array $_defaultConfig = [
         'assetBasePath' => WWW_ROOT,
         'all' => true,
-        'input' => ['add', 'edit', 'create', 'update', 'input', 'register'],
-        'form' => ['form', 'confirm'],
+        'input' => ['add', 'edit'],
+        'form' => ['add', 'edit', 'view'],
     ];
 
     /**
@@ -36,9 +36,9 @@ class AutoAssetHelper extends Helper
     public function initialize(array $config): void
     {
         try {
-            Configure::load('auto_asset');
-            if (Configure::check('auto_asset')) {
-                $this->setConfig(Configure::read('auto_asset'));
+            Configure::load('autoasset');
+            if (Configure::check('AutoAsset')) {
+                $this->setConfig(Configure::read('AutoAsset'));
             }
         } catch (Exception $e) {
             // 設定ファイルがない場合はデフォルト設定を使用

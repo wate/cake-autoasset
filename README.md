@@ -64,15 +64,15 @@ webroot/
 
 ## 設定
 
-`config/auto_asset.php` を作成します。
+`config/autoasset.php` を作成します。
 
 ```php
 <?php
 return [
     'AutoAsset' => [
-        'all' => true,                                  // 全画面で読み込む
-        'input' => ['add', 'edit', 'create', 'update', 'input', 'register'],
-        'form' => ['form', 'confirm'],
+        'all' => true,              // 全画面で読み込む
+        'input' => ['add', 'edit'], // add, edit で input.js/css を読み込む
+        'form' => ['add', 'edit', 'view'], // add, edit, view で form.js/css を読み込む
     ],
 ];
 ```

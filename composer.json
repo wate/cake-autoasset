@@ -2,7 +2,21 @@
   "name": "wate/cake-autoasset",
   "description": "CakePHP plugin for automatic asset loading based on controller/action conventions",
   "type": "cakephp-plugin",
+  "keywords": [
+    "cakephp",
+    "plugin",
+    "asset",
+    "javascript",
+    "css",
+    "autoload"
+  ],
   "license": "MIT",
+  "authors": [
+    {
+      "name": "Wate",
+      "role": "Author"
+    }
+  ],
   "require": {
     "php": ">=8.2",
     "cakephp/cakephp": "^5.0"
@@ -19,5 +33,8 @@
     "psr-4": {
       "AutoAsset\\Test\\": "tests/"
     }
+  },
+  "extra": {
+    "plugin": "AutoAsset"
   }
 }
