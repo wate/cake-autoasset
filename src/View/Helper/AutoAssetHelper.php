@@ -142,6 +142,22 @@ class AutoAssetHelper extends Helper
             $files[] = str_replace(DS, '/', $actionPath);
         }
 
+        // プレフィックス共通（例: Admin/all.css）
+        if ($prefix) {
+            foreach ($patterns as $pattern => $condition) {
+                if (!is_string($pattern)) {
+                    continue;
+                }
+
+                if ($condition === true || (is_array($condition) && in_array($action, $condition, true))) {
+                    $prefixCommonPath = $prefix . DS . $pattern;
+                    if (file_exists($basePath . $prefixCommonPath . '.' . $ext)) {
+                        $files[] = str_replace(DS, '/', $prefixCommonPath);
+                    }
+                }
+            }
+        }
+
         // コントローラ共通（プレフィックス付き）
         if ($prefix) {
             foreach ($patterns as $pattern => $condition) {

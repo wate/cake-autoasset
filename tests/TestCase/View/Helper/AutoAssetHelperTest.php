@@ -192,6 +192,25 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
+     * Test resolveFiles with prefix common (Admin/all.css)
+     */
+    public function testResolveFilesWithPrefixCommon(): void
+    {
+        $helper = $this->createHelper([
+            'prefix' => 'Admin',
+        ]);
+        $this->createAssetFile('js/all.js');
+        $this->createAssetFile('js/Admin/all.js');
+        $this->createAssetFile('js/Admin/Hearings/index.js');
+
+        $method = new \ReflectionMethod($helper, 'resolveFiles');
+        $files = $method->invoke($helper, 'js');
+
+        $this->assertCount(3, $files);
+        $this->assertEquals(['all', 'Admin/all', 'Admin/Hearings/index'], $files);
+    }
+
+    /**
      * Test resolveFiles with input action
      */
     public function testResolveFilesInputAction(): void
