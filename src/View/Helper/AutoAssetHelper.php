@@ -20,9 +20,12 @@ class AutoAssetHelper extends Helper
      */
     protected array $_defaultConfig = [
         'assetBasePath' => WWW_ROOT,
-        'all' => true,
-        'input' => ['add', 'edit'],
-        'form' => ['add', 'edit', 'view'],
+        'module' => false,
+        'patterns' => [
+            'all' => true,
+            'input' => ['add', 'edit'],
+            'form' => ['add', 'edit', 'view'],
+        ],
     ];
 
     /**
@@ -55,8 +58,12 @@ class AutoAssetHelper extends Helper
     {
         $files = $this->resolveFiles('js');
         $output = '';
+        $options = [];
+        if ($this->getConfig('module')) {
+            $options['type'] = 'module';
+        }
         foreach ($files as $file) {
-            $output .= $this->Html->script($file, ['block' => true]);
+            $output .= $this->Html->script($file, $options + ['block' => true]);
         }
         return $output;
     }
@@ -91,10 +98,10 @@ class AutoAssetHelper extends Helper
 
         $files = [];
         $basePath = $this->getConfig('assetBasePath') . $ext . DS;
-        $config = $this->getConfig();
+        $patterns = $this->getConfig('patterns') ?: [];
 
         // ファイルパターンごとに判定（グローバル共通ファイル）
-        foreach ($config as $pattern => $condition) {
+        foreach ($patterns as $pattern => $condition) {
             if (!is_string($pattern)) {
                 continue;
             }
@@ -116,7 +123,7 @@ class AutoAssetHelper extends Helper
         }
 
         // コントローラ共通（無印）
-        foreach ($config as $pattern => $condition) {
+        foreach ($patterns as $pattern => $condition) {
             if (!is_string($pattern)) {
                 continue;
             }
@@ -137,7 +144,7 @@ class AutoAssetHelper extends Helper
 
         // コントローラ共通（プレフィックス付き）
         if ($prefix) {
-            foreach ($config as $pattern => $condition) {
+            foreach ($patterns as $pattern => $condition) {
                 if (!is_string($pattern)) {
                     continue;
                 }

@@ -48,18 +48,18 @@ return [
 
 ```
 webroot/
-├── js/
-│   ├── all.js              # 全画面で読み込む
-│   ├── Form.js             # 特定画面種別で読み込む
-│   ├── Hearings/
-│   │   ├── all.js          # Hearingsコントローラ全アクション
-│   │   └── index.js        # HearingsController::index
-│   └── Admin/
-│       └── Hearings/
-│           ├── all.js      # Admin/Hearingsコントローラ全アクション
-│           └── index.js    # Admin\HearingsController::index
-└── css/
-    └── （jsと同じ構造）
+├ js/
+│   ├ all.js              # 全画面で読み込む
+│   ├ Form.js             # 特定画面種別で読み込む
+│   ├ Hearings/
+│   │   ├ all.js          # Hearingsコントローラ全アクション
+│   │   └ index.js        # HearingsController::index
+│   └ Admin/
+│       └ Hearings/
+│           ├ all.js      # Admin/Hearingsコントローラ全アクション
+│           └ index.js    # Admin\HearingsController::index
+└ css/
+    └ （jsと同じ構造）
 ```
 
 ## 設定

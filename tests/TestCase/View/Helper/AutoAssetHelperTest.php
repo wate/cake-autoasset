@@ -29,7 +29,7 @@ class AutoAssetHelperTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        
+
         // 一時ディレクトリを作成
         $this->tmpPath = sys_get_temp_dir() . DS . 'autoasset_test_' . uniqid() . DS;
         mkdir($this->tmpPath . 'js', 0777, true);
@@ -42,7 +42,7 @@ class AutoAssetHelperTest extends TestCase
     public function tearDown(): void
     {
         parent::tearDown();
-        
+
         // 一時ディレクトリを削除
         $this->removeDirectory($this->tmpPath);
     }
@@ -55,12 +55,12 @@ class AutoAssetHelperTest extends TestCase
         if (!is_dir($path)) {
             return;
         }
-        
+
         $files = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
         );
-        
+
         foreach ($files as $file) {
             if ($file->isDir()) {
                 rmdir($file->getRealPath());
@@ -68,7 +68,7 @@ class AutoAssetHelperTest extends TestCase
                 unlink($file->getRealPath());
             }
         }
-        
+
         rmdir($path);
     }
 
@@ -84,13 +84,13 @@ class AutoAssetHelperTest extends TestCase
                 'action' => 'index',
             ], $requestParams),
         ]);
-        
+
         $view = new View($request);
         $helper = new AutoAssetHelper($view);
-        
+
         // テスト用パスを設定
         $helper->setConfig('assetBasePath', $this->tmpPath);
-        
+
         return $helper;
     }
 
@@ -101,11 +101,11 @@ class AutoAssetHelperTest extends TestCase
     {
         $fullPath = $this->tmpPath . $path;
         $dir = dirname($fullPath);
-        
+
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
-        
+
         file_put_contents($fullPath, '// test');
     }
 
@@ -115,12 +115,10 @@ class AutoAssetHelperTest extends TestCase
     public function testResolveFilesEmpty(): void
     {
         $helper = $this->createHelper();
-        
+
         $method = new \ReflectionMethod($helper, 'resolveFiles');
-        $method->setAccessible(true);
-        
         $files = $method->invoke($helper, 'js');
-        
+
         $this->assertEmpty($files);
     }
 
@@ -131,12 +129,10 @@ class AutoAssetHelperTest extends TestCase
     {
         $helper = $this->createHelper();
         $this->createAssetFile('js/all.js');
-        
+
         $method = new \ReflectionMethod($helper, 'resolveFiles');
-        $method->setAccessible(true);
-        
         $files = $method->invoke($helper, 'js');
-        
+
         $this->assertCount(1, $files);
         $this->assertContains('all', $files);
     }
@@ -149,12 +145,10 @@ class AutoAssetHelperTest extends TestCase
         $helper = $this->createHelper();
         $this->createAssetFile('js/all.js');
         $this->createAssetFile('js/Hearings/all.js');
-        
+
         $method = new \ReflectionMethod($helper, 'resolveFiles');
-        $method->setAccessible(true);
-        
         $files = $method->invoke($helper, 'js');
-        
+
         $this->assertCount(2, $files);
         $this->assertEquals(['all', 'Hearings/all'], $files);
     }
@@ -168,12 +162,10 @@ class AutoAssetHelperTest extends TestCase
         $this->createAssetFile('js/all.js');
         $this->createAssetFile('js/Hearings/all.js');
         $this->createAssetFile('js/Hearings/index.js');
-        
+
         $method = new \ReflectionMethod($helper, 'resolveFiles');
-        $method->setAccessible(true);
-        
         $files = $method->invoke($helper, 'js');
-        
+
         $this->assertCount(3, $files);
         $this->assertEquals(['all', 'Hearings/all', 'Hearings/index'], $files);
     }
@@ -191,12 +183,10 @@ class AutoAssetHelperTest extends TestCase
         $this->createAssetFile('js/Admin/Hearings/all.js');
         $this->createAssetFile('js/Hearings/index.js');
         $this->createAssetFile('js/Admin/Hearings/index.js');
-        
+
         $method = new \ReflectionMethod($helper, 'resolveFiles');
-        $method->setAccessible(true);
-        
         $files = $method->invoke($helper, 'js');
-        
+
         $this->assertCount(5, $files);
         $this->assertEquals(['all', 'Hearings/all', 'Hearings/index', 'Admin/Hearings/all', 'Admin/Hearings/index'], $files);
     }
@@ -213,12 +203,10 @@ class AutoAssetHelperTest extends TestCase
         $this->createAssetFile('js/input.js');
         $this->createAssetFile('js/Hearings/all.js');
         $this->createAssetFile('js/Hearings/input.js');
-        
+
         $method = new \ReflectionMethod($helper, 'resolveFiles');
-        $method->setAccessible(true);
-        
         $files = $method->invoke($helper, 'js');
-        
+
         $this->assertContains('all', $files);
         $this->assertContains('input', $files);
         $this->assertContains('Hearings/all', $files);
@@ -226,7 +214,7 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Test scripts() HTML output
+     * Test scripts() HTML output (default: no module)
      */
     public function testScriptsOutput(): void
     {
@@ -234,18 +222,21 @@ class AutoAssetHelperTest extends TestCase
             'controller' => 'Hearings',
             'action' => 'index',
         ]);
+        $helper->setConfig('module', false);
         $this->createAssetFile('js/all.js');
         $this->createAssetFile('js/Hearings/index.js');
 
         $helper->scripts();
 
         $scriptBlock = $helper->getView()->fetch('script');
-        $this->assertStringContainsString('all.js', $scriptBlock);
-        $this->assertStringContainsString('Hearings/index.js', $scriptBlock);
+        $this->assertStringContainsString('<script', $scriptBlock);
+        $this->assertStringContainsString('src="/js/all.js"', $scriptBlock);
+        $this->assertStringContainsString('src="/js/Hearings/index.js"', $scriptBlock);
+        $this->assertStringNotContainsString('type="module"', $scriptBlock);
     }
 
     /**
-     * Test styles() HTML output
+     * Test styles() HTML output (<link> tag)
      */
     public function testStylesOutput(): void
     {
@@ -259,8 +250,10 @@ class AutoAssetHelperTest extends TestCase
         $helper->styles();
 
         $cssBlock = $helper->getView()->fetch('css');
-        $this->assertStringContainsString('all.css', $cssBlock);
-        $this->assertStringContainsString('Hearings/index.css', $cssBlock);
+        $this->assertStringContainsString('<link', $cssBlock);
+        $this->assertStringContainsString('rel="stylesheet"', $cssBlock);
+        $this->assertStringContainsString('href="/css/all.css"', $cssBlock);
+        $this->assertStringContainsString('href="/css/Hearings/index.css"', $cssBlock);
     }
 
     /**
@@ -278,5 +271,43 @@ class AutoAssetHelperTest extends TestCase
 
         $this->assertEmpty($helper->getView()->fetch('script'));
         $this->assertEmpty($helper->getView()->fetch('css'));
+    }
+
+    /**
+     * Test scripts() with module mode
+     */
+    public function testScriptsModuleOutput(): void
+    {
+        $helper = $this->createHelper([
+            'controller' => 'Hearings',
+            'action' => 'index',
+        ]);
+        $helper->setConfig('module', true);
+        $this->createAssetFile('js/all.js');
+
+        $helper->scripts();
+
+        $scriptBlock = $helper->getView()->fetch('script');
+        $this->assertStringContainsString('all.js', $scriptBlock);
+        $this->assertStringContainsString('type="module"', $scriptBlock);
+    }
+
+    /**
+     * Test styles() are not affected by module mode
+     */
+    public function testStylesNotAffectedByModule(): void
+    {
+        $helper = $this->createHelper([
+            'controller' => 'Hearings',
+            'action' => 'index',
+        ]);
+        $helper->setConfig('module', true);
+        $this->createAssetFile('css/all.css');
+
+        $helper->styles();
+
+        $cssBlock = $helper->getView()->fetch('css');
+        $this->assertStringContainsString('all.css', $cssBlock);
+        $this->assertStringNotContainsString('module', $cssBlock);
     }
 }
