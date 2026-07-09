@@ -36,5 +36,8 @@
   },
   "extra": {
     "plugin": "AutoAsset"
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit tests/TestCase"
   }
 }
