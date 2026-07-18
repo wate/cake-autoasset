@@ -9,22 +9,34 @@ use Cake\View\View;
 use AutoAsset\View\Helper\AutoAssetHelper;
 
 /**
- * AutoAssetHelper Test Case
+ * AutoAssetHelperTest
+ *
+ * AutoAssetHelper によるアセット自動解決とHTML出力を検証する。
+ * テスト用の一時ディレクトリに擬似的なアセットファイルを配置し、
+ * 命名規則に基づくファイル解決が正しく動作することを確認する。
  */
 class AutoAssetHelperTest extends TestCase
 {
     /**
-     * @var AutoAssetHelper
+     * テスト対象のヘルパーインスタンス
+     *
+     * @var \AutoAsset\View\Helper\AutoAssetHelper
      */
     protected AutoAssetHelper $helper;
 
     /**
+     * テスト用一時ディレクトリのパス
+     *
      * @var string
      */
     protected string $tmpPath;
 
     /**
-     * @inheritDoc
+     * テスト前処理
+     *
+     * 一時ディレクトリを作成し、js/css サブディレクトリを準備する。
+     *
+     * @return void
      */
     public function setUp(): void
     {
@@ -37,7 +49,11 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * @inheritDoc
+     * テスト後処理
+     *
+     * 一時ディレクトリを削除する。
+     *
+     * @return void
      */
     public function tearDown(): void
     {
@@ -48,7 +64,10 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * ディレクトリを再帰的に削除
+     * ディレクトリを再帰的に削除する。
+     *
+     * @param string $path 削除対象のディレクトリパス
+     * @return void
      */
     protected function removeDirectory(string $path): void
     {
@@ -73,7 +92,13 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Helperを初期化
+     * テスト用ヘルパーインスタンスを生成する。
+     *
+     * 指定されたリクエストパラメータに基づいて ServerRequest と View を構築し、
+     * AutoAssetHelper のインスタンスを返す。
+     *
+     * @param array<string, mixed> $requestParams リクエストパラメータ（controller, action, prefix 等）
+     * @return \AutoAsset\View\Helper\AutoAssetHelper
      */
     protected function createHelper(array $requestParams = []): AutoAssetHelper
     {
@@ -95,7 +120,13 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * テスト用ファイルを作成
+     * テスト用のアセットファイルを作成する。
+     *
+     * 指定されたパスにダミーのアセットファイルを生成する。
+     * 必要に応じて親ディレクトリも自動作成する。
+     *
+     * @param string $path アセットファイルの相対パス（例: 'js/all.js'）
+     * @return void
      */
     protected function createAssetFile(string $path): void
     {
@@ -110,7 +141,9 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Test resolveFiles with no files
+     * アセットファイルが存在しない場合、空配列が返されることを検証する。
+     *
+     * @return void
      */
     public function testResolveFilesEmpty(): void
     {
@@ -123,7 +156,9 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Test resolveFiles with all.js only
+     * all.js のみが存在する場合、グローバル共通ファイルが正しく解決されることを検証する。
+     *
+     * @return void
      */
     public function testResolveFilesAllOnly(): void
     {
@@ -138,7 +173,9 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Test resolveFiles with controller common
+     * コントローラ共通ファイル（Hearings/all.js）が解決されることを検証する。
+     *
+     * @return void
      */
     public function testResolveFilesController(): void
     {
@@ -154,7 +191,9 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Test resolveFiles with action specific
+     * アクション固有ファイル（Hearings/index.js）が解決されることを検証する。
+     *
+     * @return void
      */
     public function testResolveFilesAction(): void
     {
@@ -171,7 +210,9 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Test resolveFiles with prefix
+     * プレフィックス付き（Admin/）の全パターンが正しく解決されることを検証する。
+     *
+     * @return void
      */
     public function testResolveFilesWithPrefix(): void
     {
@@ -192,7 +233,9 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Test resolveFiles with prefix common (Admin/all.css)
+     * プレフィックス共通ファイル（Admin/all.js）が解決されることを検証する。
+     *
+     * @return void
      */
     public function testResolveFilesWithPrefixCommon(): void
     {
@@ -211,7 +254,9 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Test resolveFiles with input action
+     * input アクション（add）時に input.js が解決されることを検証する。
+     *
+     * @return void
      */
     public function testResolveFilesInputAction(): void
     {
@@ -233,7 +278,9 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Test scripts() HTML output (default: no module)
+     * scripts() の標準（非module）モードで<script>タグが正しく出力されることを検証する。
+     *
+     * @return void
      */
     public function testScriptsOutput(): void
     {
@@ -255,7 +302,9 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Test styles() HTML output (<link> tag)
+     * styles() で<link>タグが正しく出力されることを検証する。
+     *
+     * @return void
      */
     public function testStylesOutput(): void
     {
@@ -276,7 +325,9 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Test empty output when no files exist
+     * アセットファイルが存在しない場合、空の出力になることを検証する。
+     *
+     * @return void
      */
     public function testScriptsEmptyOutput(): void
     {
@@ -293,7 +344,9 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Test scripts() with module mode
+     * scripts() の module モードで type="module" 属性が付与されることを検証する。
+     *
+     * @return void
      */
     public function testScriptsModuleOutput(): void
     {
@@ -312,7 +365,9 @@ class AutoAssetHelperTest extends TestCase
     }
 
     /**
-     * Test styles() are not affected by module mode
+     * styles() が module モードの影響を受けないことを検証する。
+     *
+     * @return void
      */
     public function testStylesNotAffectedByModule(): void
     {

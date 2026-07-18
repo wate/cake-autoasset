@@ -11,11 +11,30 @@ use Exception;
 /**
  * AutoAssetHelper
  *
- * コントローラー/アクションに対応するアセットを自動的に読み込む
+ * コントローラー/アクションに対応するアセットを自動的に読み込むヘルパー。
+ * 設定ファイル(autoasset.php)に基づき、命名規則に従ったJS/CSSファイルを
+ * 自動解決してHTML出力する。
+ *
+ * 解決順序:
+ *   1. グローバル共通 (例: all.js)
+ *   2. グローバル画面種別 (例: input.js, form.js)
+ *   3. コントローラ共通 (例: Users/all.js)
+ *   4. アクション固有 (例: Users/index.js)
+ *   5. プレフィックス共通 (例: Admin/all.js)
+ *   6. コントローラ共通+プレフィックス (例: Admin/Users/all.js)
+ *   7. アクション固有+プレフィックス (例: Admin/Users/index.js)
+ *
+ * @property \Cake\View\Helper\HtmlHelper $Html
  */
 class AutoAssetHelper extends Helper
 {
     /**
+     * デフォルト設定
+     *
+     * - assetBasePath: アセットファイルのベースパス
+     * - module: ES moduleモードフラグ
+     * - patterns: 解決パターン定義
+     *
      * @var array<string, mixed>
      */
     protected array $_defaultConfig = [
@@ -29,12 +48,20 @@ class AutoAssetHelper extends Helper
     ];
 
     /**
+     * 使用するヘルパー
+     *
      * @var array<string>
      */
     protected array $helpers = ['Html'];
 
     /**
-     * @inheritDoc
+     * 初期化処理
+     *
+     * autoasset.php 設定ファイルを読み込み、デフォルト設定を上書きする。
+     * 設定ファイルが存在しない場合はデフォルト設定のまま動作する。
+     *
+     * @param array<string, mixed> $config 初期化オプション
+     * @return void
      */
     public function initialize(array $config): void
     {
@@ -50,9 +77,12 @@ class AutoAssetHelper extends Helper
     }
 
     /**
-     * JSファイルの自動読み込み
+     * JSファイルの自動読み込みを実行する。
      *
-     * @return string
+     * 解決されたJSファイルを<script>タグとしてブロックに出力する。
+     * moduleモードが有効な場合は type="module" 属性を付与する。
+     *
+     * @return string 出力結果（blockオプションにより実際はビューブロックに格納される）
      */
     public function scripts(): string
     {
@@ -69,9 +99,11 @@ class AutoAssetHelper extends Helper
     }
 
     /**
-     * CSSファイルの自動読み込み
+     * CSSファイルの自動読み込みを実行する。
      *
-     * @return string
+     * 解決されたCSSファイルを<link>タグとしてブロックに出力する。
+     *
+     * @return string 出力結果（blockオプションにより実際はビューブロックに格納される）
      */
     public function styles(): string
     {
@@ -84,9 +116,18 @@ class AutoAssetHelper extends Helper
     }
 
     /**
-     * アセットファイルの解決
+     * アセットファイルを命名規則に従って解決する。
      *
-     * @param string $ext 拡張子（js/css）
+     * 以下の優先順位でファイルを探索する:
+     * 1. グローバル共通 (patterns の条件が true のもの)
+     * 2. グローバル画面種別 (patterns の条件が配列でアクションが合致するもの)
+     * 3. コントローラ共通 (例: Users/all.js)
+     * 4. アクション固有 (例: Users/index.js)
+     * 5. プレフィックス共通 (例: Admin/all.js)
+     * 6. コントローラ共通+プレフィックス (例: Admin/Users/all.js)
+     * 7. アクション固有+プレフィックス (例: Admin/Users/index.js)
+     *
+     * @param string $ext 拡張子（'js' または 'css'）
      * @return array<string> 読み込むファイルパスの配列
      */
     protected function resolveFiles(string $ext): array

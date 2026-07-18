@@ -1,9 +1,10 @@
 <?php
 /**
- * Test bootstrap for AutoAsset plugin.
+ * AutoAsset プラグインのテスト用ブートストラップ
  *
- * Self-contained bootstrap: this plugin's tests do not touch the database or
- * app-level config/routing, so no host application is required to run them.
+ * 自己完結型ブートストラップ。本プラグインのテストはデータベースや
+ * アプリレベルの設定/ルーティングに依存しないため、
+ * ホストアプリケーションは不要。
  */
 require dirname(__DIR__) . '/vendor/autoload.php';
 
